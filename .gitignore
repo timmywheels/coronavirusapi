@@ -1,3 +1,8 @@
+log
+config/database.yml
+tmp
+config/credentials.yml.enc
+
 *.rbc
 capybara-*.html
 .rspec

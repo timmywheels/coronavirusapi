@@ -1,0 +1,54 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @state.name %>
+</p>
+
+<p>
+  <strong>Tested:</strong>
+  <%= @state.tested %>
+</p>
+
+<p>
+  <strong>Positive:</strong>
+  <%= @state.positive %>
+</p>
+
+<p>
+  <strong>Deaths:</strong>
+  <%= @state.deaths %>
+</p>
+
+<p>
+  <strong>Tested crawl date:</strong>
+  <%= @state.tested_crawl_date %>
+</p>
+
+<p>
+  <strong>Positive crawl date:</strong>
+  <%= @state.positive_crawl_date %>
+</p>
+
+<p>
+  <strong>Deaths crawl date:</strong>
+  <%= @state.deaths_crawl_date %>
+</p>
+
+<p>
+  <strong>Tested source:</strong>
+  <%= @state.tested_source %>
+</p>
+
+<p>
+  <strong>Positive source:</strong>
+  <%= @state.positive_source %>
+</p>
+
+<p>
+  <strong>Deaths source:</strong>
+  <%= @state.deaths_source %>
+</p>
+
+<%= link_to 'Edit', edit_state_path(@state) %> |
+<%= link_to 'Back', states_path %>

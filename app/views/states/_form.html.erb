@@ -1,0 +1,67 @@
+<%= form_with(model: state, local: true) do |form| %>
+  <% if state.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(state.errors.count, "error") %> prohibited this state from being saved:</h2>
+
+      <ul>
+        <% state.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :name %>
+    <%= form.text_field :name %>
+  </div>
+
+  <div class="field">
+    <%= form.label :tested %>
+    <%= form.number_field :tested %>
+  </div>
+
+  <div class="field">
+    <%= form.label :positive %>
+    <%= form.number_field :positive %>
+  </div>
+
+  <div class="field">
+    <%= form.label :deaths %>
+    <%= form.number_field :deaths %>
+  </div>
+
+  <div class="field">
+    <%= form.label :tested_crawl_date %>
+    <%= form.text_field :tested_crawl_date %>
+  </div>
+
+  <div class="field">
+    <%= form.label :positive_crawl_date %>
+    <%= form.text_field :positive_crawl_date %>
+  </div>
+
+  <div class="field">
+    <%= form.label :deaths_crawl_date %>
+    <%= form.text_field :deaths_crawl_date %>
+  </div>
+
+  <div class="field">
+    <%= form.label :tested_source %>
+    <%= form.text_field :tested_source %>
+  </div>
+
+  <div class="field">
+    <%= form.label :positive_source %>
+    <%= form.text_field :positive_source %>
+  </div>
+
+  <div class="field">
+    <%= form.label :deaths_source %>
+    <%= form.text_field :deaths_source %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>
