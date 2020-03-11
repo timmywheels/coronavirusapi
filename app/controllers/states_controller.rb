@@ -1,26 +1,27 @@
 class StatesController < ApplicationController
   before_action :set_state, only: [:show, :edit, :update, :destroy]
 
+  STATE_COUNT = 51
+  
   def summary
-    @states = State.all.limit(51).order(id: :desc).reverse
+    @updated_date = State.last.created_at.to_s
+
+    @states = State.all.limit(STATE_COUNT).order(id: :desc).reverse
+
     @tested = @states.map {|s| s.tested}.compact.sum
     @positive = @states.map {|s| s.positive}.compact.sum
     @deaths = @states.map {|s| s.deaths}.compact.sum
+
     @sources = @states.map {|s| s.tested_source} + @states.map {|s| s.positive_source} + @states.map {|s| s.deaths_source}
     @sources = @sources.compact.uniq.sort
   end
 
   def summary_test
-    @states = State.all.limit(51).order(id: :desc).reverse
-    @tested = @states.map {|s| s.tested}.compact.sum
-    @positive = @states.map {|s| s.positive}.compact.sum
-    @deaths = @states.map {|s| s.deaths}.compact.sum
-    @sources = @states.map {|s| s.tested_source} + @states.map {|s| s.positive_source} + @states.map {|s| s.deaths_source}
-    @sources = @sources.compact.uniq.sort
+    summary
   end
 
   def export_csv
-	  @states = State.where('id>102')
+	  @states = State.where("id>#{State.count - STATE_COUNT}")
 	  respond_to do |format|
 		  format.csv { send_data @states.to_csv, filename: "states.csv" }
 	  end

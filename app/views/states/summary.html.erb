@@ -1,8 +1,11 @@
 <p id="notice"><%= notice %></p>
 
-<h1>Coronavirus (COVID-19) Data</h1>
-<h2>Crawled data from government websites for 50 states and DC (Updated 3/8/2020)</h2>
-<h4>(<a href="mailto:dbyang@gmail.com">Contact me</a> for data dumps)</h4>
+<h1>Coronavirus (COVID-19) Testing Data</h1>
+
+<h2>Crawled data from US government websites for 50 states and DC (Updated <%= @updated_date %>)</h2>
+
+<h4><a href="mailto:dbyang@gmail.com">Contact me</a> for more data, or if you want to contribute to this project. 
+The purpose of this project is to better understand the current status of testing and the disease spread of COVID-19.</h4>
 
 <table class="pretty" border="1">
   <thead>
@@ -11,7 +14,6 @@
       <th>Tested</th>
       <th>Positive</th>
       <th>Deaths</th>
-      <th colspan="3"></th>
     </tr>
   </thead>
 
@@ -26,7 +28,7 @@
 
     <% @states.each do |state| %>
       <tr>
-        <td><%= state.name %></td>
+	      <td><a href="<%= state.positive_source %>"><%= state.name %></a></td>
         <td><%= state.tested %></td>
         <td><%= state.positive %></td>
         <td><%= state.deaths %></td>
