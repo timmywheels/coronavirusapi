@@ -4,4 +4,5 @@ Rails.application.routes.draw do
 	root 'states#summary'
 	get '/testxyz', to: 'states#summary_test'
 	get '/states.csv', to: 'states#export_csv'
+	get '/time_series.csv', to: 'states#export_time_series_csv'
 end

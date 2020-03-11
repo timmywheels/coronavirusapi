@@ -4,9 +4,9 @@ class StatesController < ApplicationController
   STATE_COUNT = 51
   
   def summary
-    @updated_date = State.last.created_at.to_s
-
     @states = State.all.limit(STATE_COUNT).order(id: :desc).reverse
+
+    @updated_date = @states.first.created_at.to_s
 
     @tested = @states.map {|s| s.tested}.compact.sum
     @positive = @states.map {|s| s.positive}.compact.sum
@@ -25,6 +25,20 @@ class StatesController < ApplicationController
 	  respond_to do |format|
 		  format.csv { send_data @states.to_csv, filename: "states.csv" }
 	  end
+  end
+
+  def export_time_series_csv
+	  data = State.all.each_slice(51).to_a.map {|arr| [arr[0].created_at.to_s[0..18].split(" "),arr[0].created_at.to_i,arr.map {|i| (i.tested ? i.tested : 0)}.sum, arr.map {|i| (i.positive ? i.positive : 0)}.sum, arr.map {|i| (i.deaths ? i.deaths : 0) }.sum ].flatten }
+
+attributes = %w{date time seconds_since_Epoch tested positive deaths}
+                out = CSV.generate(headers: true) do |csv|
+                        csv << attributes
+			data.each { |i| csv << i }
+                end
+
+	  respond_to do |format|
+                  format.csv { send_data out, filename: "time_series.csv" }
+          end
   end
 
 
