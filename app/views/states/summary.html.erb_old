@@ -7,21 +7,6 @@
 <h4><a href="mailto:dbyang@gmail.com">Contact me</a> for more data, or if you want to contribute to this project. 
 The purpose of this project is to better understand the current status of testing and the disease spread of COVID-19.</h4>
 
-<div class="container">
-  <h4>Total number tested over time (days):</h4>
-  <%= line_chart @chart_tested, curve: false %>
-</div>
-<div class="container">
-  <h4>Total positive cases over time (days):</h4>
-  <%= line_chart @chart_pos, curve: false %>
-</div>
-<div class="container">
-  <h4>Total deaths over time (days):</h4>
-  <%= line_chart @chart_deaths, curve: false %>
-</div>
-
-<h4>Stats crawled for each state:</h4>
-
 <table class="pretty" border="1">
   <thead>
     <tr>
@@ -56,6 +41,7 @@ The purpose of this project is to better understand the current status of testin
 <a href="/states.csv">State data in csv format</a>
 <br>
 <a href="/time_series.csv">Time series in csv format</a>
+
 
 <h4>Sources:</h4>
 <table>

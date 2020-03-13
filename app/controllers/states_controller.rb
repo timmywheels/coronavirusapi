@@ -14,6 +14,16 @@ class StatesController < ApplicationController
 
     @sources = @states.map {|s| s.tested_source} + @states.map {|s| s.positive_source} + @states.map {|s| s.deaths_source}
     @sources = @sources.compact.uniq.sort
+
+    y=State.all.each_slice(51).to_a.map {|arr| [arr[0].created_at.to_i.to_f/3600/24-18329,arr.map {|i| (i.tested ? i.tested : 0)}.sum, arr.map {|i| (i.positive ? i.positive : 0)}.sum, arr.map {|i| (i.deaths ? i.deaths : 0) }.sum ].flatten }
+    @chart_tested = {}
+    @chart_pos = {}
+    @chart_deaths = {}
+    y.each do |x, tested, pos, deaths|
+	@chart_tested[x] = tested
+    	@chart_pos[x] = pos
+    	@chart_deaths[x] = deaths
+    end
   end
 
   def summary_test
