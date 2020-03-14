@@ -25,16 +25,21 @@
 </table>
 
 <div class="container">
-  <h5>Total number tested over time (days):</h5>
-  <%= line_chart @chart_tested, curve: false %>
+  <h5>Total number tested over time:</h5>
+  <%= line_chart @chart_tested, curve: false, xtitle: "Days", points: false, thousands: "," %>
 </div>
 <div class="container">
-  <h5>Total positive cases over time (days):</h5>
-  <%= line_chart @chart_pos, curve: false %>
+  <h5>Total positive cases over time:</h5>
+  <%= line_chart @chart_pos, curve: false, xtitle: "Days", points: false, thousands: "," %>
 </div>
 <div class="container">
-  <h5>Total deaths over time (days):</h5>
-  <%= line_chart @chart_deaths, curve: false %>
+  <h5>Total deaths over time:</h5>
+  <%= line_chart @chart_deaths, curve: false, xtitle: "Days", points: false, thousands: "," %>
+</div>
+
+<div class="container">
+  <h5>Cases in top states over time:</h5>
+  <%= line_chart @chart_states, curve: false, xtitle: "Days", points: false, legend: "right", thousands: "," %>
 </div>
 
 <h4>Latest data crawled for each state:</h4>

@@ -25,6 +25,16 @@ class StatesController < ApplicationController
     	@chart_pos[x] = pos
     	@chart_deaths[x] = deaths
     end
+
+    names = @states.to_a.sort {|i,j| j.positive <=> i.positive}.map {|i| i.name }[0..4]
+
+    @chart_states = names.map do |name|
+            h = {}
+            State.where("name='#{name}'").to_a.map {|s| h[((s.created_at.to_i.to_f/3600/24-18329)*100).round.to_f/100] = s.positive }
+      {'name' => name,
+       'data' => h
+      }
+    end
   end
 
   def summary_test
@@ -37,6 +47,20 @@ class StatesController < ApplicationController
 		  format.csv { send_data @states.to_csv, filename: "states.csv" }
 	  end
   end
+
+  def export_all
+	  data = State.all.map {|s| [s.created_at.to_i, s.name, s.tested, s.positive, s.deaths]}
+	  attributes = %w{seconds_since_Epoch state tested positive deaths}
+	  out = CSV.generate(headers: true) do |csv|
+		  csv << attributes
+		  data.each { |i| csv << i}
+	  end
+          respond_to do |format|
+                  format.csv { send_data out, filename: "export_all.csv" }
+          end
+  end
+
+
 
   def export_time_series_csv
 	  data = State.all.each_slice(51).to_a.map {|arr| [arr[0].created_at.to_s[0..18].split(" "),arr[0].created_at.to_i,arr.map {|i| (i.tested ? i.tested : 0)}.sum, arr.map {|i| (i.positive ? i.positive : 0)}.sum, arr.map {|i| (i.deaths ? i.deaths : 0) }.sum ].flatten }

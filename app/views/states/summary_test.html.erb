@@ -1,26 +1,48 @@
 <p id="notice"><%= notice %></p>
 
-<h1>Coronavirus (COVID-19) Testing Data</h1>
+<h2>Coronavirus (COVID-19) US State Data Tracking Project</h2>
 
-<h2>Crawled data from US government websites for 50 states and DC (Updated <%= @updated_date %>)</h2>
+<h3>Record of official data from US government websites for the 50 states and DC (last crawled <%= @updated_date %>)</h3>
 
-<h4><a href="mailto:dbyang@gmail.com">Contact me</a> for more data, or if you want to contribute to this project. 
-The purpose of this project is to better understand the current status of testing and the disease spread of COVID-19.</h4>
+<h4><a href="mailto:dbyang@gmail.com">Contact</a> for more info, or if you want to contribute to the project. 
+</h4>
+
+<table class="pretty" border="1">
+  <thead>
+    <tr>
+      <th>Tested</th>
+      <th>Positive</th>
+      <th>Deaths</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><%= @tested %></td>
+        <td><%= @positive %></td>
+        <td><%= @deaths %></td>
+      </tr>
+  </tbody>
+</table>
 
 <div class="container">
-  <h4>Total number tested over time (days):</h4>
-  <%= line_chart @chart_tested, curve: false %>
+  <h5>Total number tested over time:</h5>
+  <%= line_chart @chart_tested, curve: false, xtitle: "Days", points: false, thousands: "," %>
 </div>
 <div class="container">
-  <h4>Total positive cases over time (days):</h4>
-  <%= line_chart @chart_pos, curve: false %>
+  <h5>Total positive cases over time:</h5>
+  <%= line_chart @chart_pos, curve: false, xtitle: "Days", points: false, thousands: "," %>
 </div>
 <div class="container">
-  <h4>Total deaths over time (days):</h4>
-  <%= line_chart @chart_deaths, curve: false %>
+  <h5>Total deaths over time:</h5>
+  <%= line_chart @chart_deaths, curve: false, xtitle: "Days", points: false, thousands: "," %>
 </div>
 
-<h4>Stats crawled for each state:</h4>
+<div class="container">
+  <h5>Cases in top states over time:</h5>
+  <%= line_chart @chart_states, curve: false, xtitle: "Days", points: false, legend: "right", thousands: "," %>
+</div>
+
+<h4>Latest data crawled for each state:</h4>
 
 <table class="pretty" border="1">
   <thead>
@@ -33,13 +55,6 @@ The purpose of this project is to better understand the current status of testin
   </thead>
 
   <tbody>
-
-      <tr>
-        <td>Total</td>
-        <td><%= @tested %></td>
-        <td><%= @positive %></td>
-        <td><%= @deaths %></td>
-      </tr>
 
     <% @states.each do |state| %>
       <tr>
