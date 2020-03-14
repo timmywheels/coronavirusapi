@@ -2,7 +2,7 @@ class StatesController < ApplicationController
   before_action :set_state, only: [:show, :edit, :update, :destroy]
 
   STATE_COUNT = 51
-  
+ 
   def summary
     @states = State.all.limit(STATE_COUNT).order(id: :desc).reverse
 
@@ -15,7 +15,8 @@ class StatesController < ApplicationController
     @sources = @states.map {|s| s.tested_source} + @states.map {|s| s.positive_source} + @states.map {|s| s.deaths_source}
     @sources = @sources.compact.uniq.sort
 
-    y=State.all.each_slice(51).to_a.map {|arr| [arr[0].created_at.to_i.to_f/3600/24-18329,arr.map {|i| (i.tested ? i.tested : 0)}.sum, arr.map {|i| (i.positive ? i.positive : 0)}.sum, arr.map {|i| (i.deaths ? i.deaths : 0) }.sum ].flatten }
+    y=State.all.each_slice(51).to_a.map {|arr| [((arr[0].created_at.to_i.to_f/3600/24-18329)*100).round.to_f/100,
+						arr.map {|i| (i.tested ? i.tested : 0)}.sum, arr.map {|i| (i.positive ? i.positive : 0)}.sum, arr.map {|i| (i.deaths ? i.deaths : 0) }.sum ].flatten }
     @chart_tested = {}
     @chart_pos = {}
     @chart_deaths = {}
