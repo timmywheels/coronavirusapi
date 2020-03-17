@@ -15,7 +15,7 @@ class StatesController < ApplicationController
     @sources = @states.map {|s| s.tested_source} + @states.map {|s| s.positive_source} + @states.map {|s| s.deaths_source}
     @sources = @sources.compact.uniq.sort
 
-    y=State.all.each_slice(51).to_a.map {|arr| [((arr[0].created_at.to_i.to_f/3600/24-18329)*100).round.to_f/100,
+    y=State.all.each_slice(STATE_COUNT).to_a.map {|arr| [((arr[0].created_at.to_i.to_f/3600/24-18329)*10).round.to_f/10,
 						arr.map {|i| (i.tested ? i.tested : 0)}.sum, arr.map {|i| (i.positive ? i.positive : 0)}.sum, arr.map {|i| (i.deaths ? i.deaths : 0) }.sum ].flatten }
     @chart_tested = {}
     @chart_pos = {}
@@ -26,11 +26,22 @@ class StatesController < ApplicationController
     	@chart_deaths[x] = deaths
     end
 
-    names = @states.to_a.sort {|i,j| j.positive <=> i.positive}.map {|i| i.name }[0..4]
+    names = @states.to_a.sort {|i,j| j.positive <=> i.positive}.map {|i| i.name }[0..9]
 
     @chart_states = names.map do |name|
             h = {}
-            State.where("name='#{name}'").to_a.map {|s| h[((s.created_at.to_i.to_f/3600/24-18329)*100).round.to_f/100] = s.positive }
+            State.where("name='#{name}'").to_a.map {|s| h[((s.created_at.to_i.to_f/3600/24-18329)*10).round.to_f/10] = s.positive }
+      {'name' => name,
+       'data' => h
+      }
+    end
+
+    h_pop = {"AL"=>4779736, "AK"=>710231, "AZ"=>6392017, "AR"=>2915918, "CA"=>37253956, "CO"=>5029196, "CT"=>3574097, "DE"=>897934, "DC"=>601723, "FL"=>18801310, "GA"=>9687653, "HI"=>1360301, "ID"=>1567582, "IL"=>12830632, "IN"=>6483802, "IA"=>3046355, "KS"=>2853118, "KY"=>4339367, "LA"=>4533372, "ME"=>1328361, "MD"=>5773552, "MA"=>6547629, "MI"=>9883640, "MN"=>5303925, "MS"=>2967297, "MO"=>5988144, "MT"=>989415, "NE"=>1826341, "NV"=>2700551, "NH"=>1316470, "NJ"=>8791894, "NM"=>2059179, "NY"=>19378102, "NC"=>9535483, "ND"=>672591, "OH"=>11536504, "OK"=>3751351, "OR"=>3831074, "PA"=>12702379, "RI"=>1052567, "SC"=>4625364, "SD"=>814180, "TN"=>6346165, "TX"=>25145561, "US"=>308745538, "UT"=>2763885, "VT"=>625741, "VA"=>8001024, "WA"=>6724540, "WV"=>1852994, "WI"=>5686986, "WY"=>563626}
+
+names = @states.to_a.sort {|i,j| j.positive.to_f/h_pop[j.name.upcase] <=> i.positive.to_f/h_pop[i.name.upcase]}.map {|i| i.name }[0..9]
+    @chart_states2 = names.map do |name|
+            h = {}
+	    State.where("name='#{name}'").to_a.map {|s| h[((s.created_at.to_i.to_f/3600/24-18329)*10).round.to_f/10] = (s.positive.to_f/h_pop[name.upcase]*1000_000_0).round.to_f/10 }
       {'name' => name,
        'data' => h
       }
@@ -63,7 +74,7 @@ class StatesController < ApplicationController
 
 
   def export_time_series_csv
-	  data = State.all.each_slice(51).to_a.map {|arr| [arr[0].created_at.to_s[0..18].split(" "),arr[0].created_at.to_i,arr.map {|i| (i.tested ? i.tested : 0)}.sum, arr.map {|i| (i.positive ? i.positive : 0)}.sum, arr.map {|i| (i.deaths ? i.deaths : 0) }.sum ].flatten }
+	  data = State.all.each_slice(STATE_COUNT).to_a.map {|arr| [arr[0].created_at.to_s[0..18].split(" "),arr[0].created_at.to_i,arr.map {|i| (i.tested ? i.tested : 0)}.sum, arr.map {|i| (i.positive ? i.positive : 0)}.sum, arr.map {|i| (i.deaths ? i.deaths : 0) }.sum ].flatten }
 
 attributes = %w{date time seconds_since_Epoch tested positive deaths}
                 out = CSV.generate(headers: true) do |csv|

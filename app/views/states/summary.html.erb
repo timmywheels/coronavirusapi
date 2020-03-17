@@ -2,7 +2,13 @@
 
 <h2>Coronavirus (COVID-19) US State Data Tracking Project</h2>
 
-<h3>Record of official data from US government websites for the 50 states and DC (last crawled <%= @updated_date %>)</h3>
+<h3>Record of official data from US government websites for the 50 states and DC.
+	All data provided here are direct crawls of state government websites. These
+	are the officially reported numbers. Unlike other coronavirus data sites, we do not rely on
+	news or human crowd sourced data. These are automatic captures of official state websites.
+	If data here sometimes seems behind it is usually for two reasons, the state
+	website is behind the news, or more rarely, the last crawl date is behind. 
+	(All websites last crawled: <%= @updated_date %>)</h3>
 
 <h4><a href="mailto:dbyang@gmail.com">Contact</a> for more info, or if you want to contribute to the project. 
 </h4>
@@ -25,7 +31,8 @@
 </table>
 
 <div class="container">
-  <h5>Total number tested over time:</h5>
+	<h5>Total number tested over time (note the spike was due to previous test numbers
+		being available):</h5>
   <%= line_chart @chart_tested, curve: false, xtitle: "Days", points: false, thousands: "," %>
 </div>
 <div class="container">
@@ -40,6 +47,11 @@
 <div class="container">
   <h5>Cases in top states over time:</h5>
   <%= line_chart @chart_states, curve: false, xtitle: "Days", points: false, legend: "right", thousands: "," %>
+</div>
+
+<div class="container">
+  <h5>Cases in top states normalized by population (1 million) over time:</h5>
+  <%= line_chart @chart_states2, curve: false, xtitle: "Days", points: false, legend: "right", thousands: "," %>
 </div>
 
 <h4>Latest data crawled for each state:</h4>
