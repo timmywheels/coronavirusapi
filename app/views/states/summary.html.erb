@@ -35,15 +35,15 @@
 <div class="container">
 	<h5>Total number tested over time (note the spike was due to previous test numbers
 		being available):</h5>
-  <%= line_chart @chart_tested, curve: false, xtitle: "Days", points: false, thousands: "," %>
+  <%= line_chart @chart_tested, curve: false, xtitle: "Date", points: false, thousands: "," %>
 </div>
 <div class="container">
   <h5>Total positive cases over time:</h5>
-  <%= line_chart @chart_pos, curve: false, xtitle: "Days", points: false, thousands: "," %>
+  <%= line_chart @chart_pos, curve: false, xtitle: "Date", points: false, thousands: "," %>
 </div>
 <div class="container">
   <h5>Total deaths over time:</h5>
-  <%= line_chart @chart_deaths, curve: false, xtitle: "Days", points: false, thousands: "," %>
+  <%= line_chart @chart_deaths, curve: false, xtitle: "Date", points: false, thousands: "," %>
 </div>
 
 <div class="container">
