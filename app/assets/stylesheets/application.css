@@ -27,3 +27,13 @@
 .pretty th .desc {
   background-image: url(/images/down_arrow.gif);
 }
+
+nav {
+  text-align: right;
+  margin-bottom: 30px;
+}
+nav > a {
+  font-size: 16px;
+  margin-left: 10px;
+  text-underline-offset: 4px;
+}
