@@ -48,12 +48,12 @@
 
 <div class="container">
   <h5>Cases in top states over time:</h5>
-  <%= line_chart @chart_states, curve: false, xtitle: "Days", points: false, legend: "right", thousands: "," %>
+  <%= line_chart @chart_states, {library: {elements: {line: {tension: 0}, point: {radius: 0}}, pointRadius: 0, legend: {position: 'right',}, scales: {yAxes: [{id: 'y-axis', type: 'logarithmic'},]}}} %>
 </div>
 
 <div class="container">
   <h5>Cases in top states normalized by population (1 million) over time:</h5>
-  <%= line_chart @chart_states2, curve: false, xtitle: "Days", points: false, legend: "right", thousands: "," %>
+  <%= line_chart @chart_states2, {library: {elements: {line: {tension: 0}, point: {radius: 0}}, pointRadius: 0, legend: {position: 'right',}, scales: {yAxes: [{id: 'y-axis', type: 'logarithmic'},]}}} %>
 </div>
 
 <h4>Latest data crawled for each state:</h4>
