@@ -26,7 +26,7 @@ class StatesController < ApplicationController
     	@chart_deaths[x] = deaths
     end
 
-    names = @states.to_a.sort {|i,j| j.positive <=> i.positive}.map {|i| i.name }[0..9]
+    names = @states.to_a.sort {|i,j| j.positive.to_i <=> i.positive.to_i}.map {|i| i.name }[0..9]
 
     @chart_states = names.map do |name|
             h = {}
