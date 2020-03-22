@@ -33,6 +33,93 @@
 </table>
 
 <div class="container">
+	<h5>US Cases by State</h5>
+
+
+  <div id="us-map-container"> </div>
+  <script>
+      function getJsonByUrl(url, callback){
+          // read text from URL location
+          var request = new XMLHttpRequest();
+          request.open('GET', url, true);
+          request.send(null);
+          request.onreadystatechange = function () {
+              if (request.readyState === 4 && request.status === 200) {
+                  var type = request.getResponseHeader('Content-Type');
+
+                  try {
+                      callback(JSON.parse(request.responseText));
+                  }catch(err) {
+                      callback(err);
+                  }
+              }
+          }
+      }
+
+      // size map based on container size to keep it responsive
+      var margin = {top: 10, left: 10, bottom: 10, right: 10}
+          , width = d3.select('#us-map-container').node().getBoundingClientRect().width
+          , width = width - margin.left - margin.right
+          , mapRatio = .5
+          , height = width * mapRatio;
+
+      var projection = d3.geoAlbersUsa()
+          .scale(width)
+          .translate([width / 2, height / 2]);
+
+      var path = d3.geoPath()
+          .projection(projection);
+
+      var svg = d3.select('#us-map-container')
+          .append('svg')
+          .attr('width', width)
+          .attr('height', height);
+
+      var caseMapUSA = svg.append('g');
+
+      getJsonByUrl("data/states-10m.json", function(states_json) {
+          console.log(states_json);
+          var geojson = topojson.feature(states_json, states_json.objects.states);
+          console.log(geojson);
+          projection.fitSize([width, height], geojson);
+          caseMapUSA.selectAll('path')
+              .data(geojson.features)
+              .enter()
+              .append('path')
+              .attr('fill', '#ccc')
+              .attr('d', path);
+
+
+      });
+
+      d3.select(window).on('resize', resize);
+      function resize() {
+          // Resize the map when the window size changes
+          width = d3.select('#us-map-container').node().getBoundingClientRect().width;
+          width = width - margin.left - margin.right;
+          height = width * mapRatio;
+          console.log(width);
+          console.log(height);
+          // update projection
+          projection
+              .translate([width / 2, height / 2])
+              .scale(width);
+
+
+          // resize the map container
+          svg
+              .style('width', width + 'px')
+              .style('height', height + 'px');
+
+          // resize the map
+          caseMapUSA.selectAll('path').attr('d', path);
+      }
+
+
+
+
+  </script>
+
 	<h5>Total number tested over time (note the spike was due to previous test numbers
 		being available):</h5>
   <%= line_chart @chart_tested, curve: false, xtitle: "Date", points: false, thousands: "," %>
