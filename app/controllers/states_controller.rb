@@ -30,7 +30,7 @@ class StatesController < ApplicationController
 
     @chart_states = names.map do |name|
             h = {}
-            State.where("name='#{name}'").to_a.map {|s| h[((s.created_at.to_i.to_f/3600/24-18329)*10).round.to_f/10] = s.positive }
+            State.where("name='#{name}'").to_a.map {|s| h[s.created_at.to_date.to_s] = s.positive }
       {'name' => name,
        'data' => h
       }
@@ -41,7 +41,7 @@ class StatesController < ApplicationController
 names = @states.to_a.sort {|i,j| j.positive.to_f/h_pop[j.name.upcase] <=> i.positive.to_f/h_pop[i.name.upcase]}.map {|i| i.name }[0..9]
     @chart_states2 = names.map do |name|
             h = {}
-	    State.where("name='#{name}'").to_a.map {|s| h[((s.created_at.to_i.to_f/3600/24-18329)*10).round.to_f/10] = (s.positive.to_f/h_pop[name.upcase]*1000_000_0).round.to_f/10 }
+	    State.where("name='#{name}'").to_a.map {|s| h[s.created_at.to_date.to_s] = (s.positive.to_f/h_pop[name.upcase]*1000_000_0).round.to_f/10 }
       {'name' => name,
        'data' => h
       }
