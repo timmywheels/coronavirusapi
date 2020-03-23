@@ -22,7 +22,8 @@ class StatesController < ApplicationController
     @chart_deaths = {}
     y.each do |x, tested, pos, deaths|
 	@chart_tested[x] = tested
-    	@chart_pos[x] = pos
+	@chart_pos[x] = pos
+	#@chart_pos[x] = Math.log(pos.to_f, 10)
     	@chart_deaths[x] = deaths
     end
 
@@ -53,7 +54,8 @@ names = @states.to_a.sort {|i,j| j.positive.to_f/h_pop[j.name.upcase] <=> i.posi
   end
 
   def export_csv
-	  @states = State.where("id>#{State.count - STATE_COUNT}")
+	  max_id = State.last.id
+	  @states = State.where("id>#{max_id - STATE_COUNT + 1}")
 	  respond_to do |format|
 		  format.csv { send_data @states.to_csv, filename: "states.csv" }
 	  end
