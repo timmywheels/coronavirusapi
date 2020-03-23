@@ -20,6 +20,8 @@ html {
 body {
   /* Prevent layout from shrinking other content when a long line overflows the viewport */
   overflow-x: scroll;
+  margin: 0px;
+  padding: 33px;
 }
 .pretty th .current {
   padding-right: 12px;
