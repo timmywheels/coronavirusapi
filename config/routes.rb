@@ -6,4 +6,6 @@ Rails.application.routes.draw do
 	get '/states.csv', to: 'states#export_csv'
 	get '/time_series.csv', to: 'states#export_time_series_csv'
 	get '/lskdjfskffesd.csv', to: 'states#export_all'
+  get '/faq', to: 'faq#index'
+	get "/:page", to: "static_pages#show"
 end
