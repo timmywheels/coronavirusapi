@@ -13,6 +13,63 @@
  *= require_tree .
  *= require_self
  */
+html {
+  /* Prevent layout jumps when switching to a page where content is shorter than viewport. */
+  overflow-y: scroll;
+}
+body {
+  /* Prevent layout from shrinking other content when a long line overflows the viewport */
+  overflow-x: scroll;
+  margin: 0px;
+  padding: 10px 33px 33px 33px;
+  min-height: 100vh;
+}
+
+h1 {
+  text-align: center;
+  line-height: 1.2em;
+}
+h1.main-header {
+  margin-top: 0px;
+  margin-bottom: 30px;
+}
+h2 {
+  line-height: 1.4em;
+  margin-bottom: 30px;
+
+}
+h3 {
+  line-height: 1.3em;
+  font-weight: normal;
+}
+h4 {
+  font-weight: normal;
+}
+h4, h5 {
+  font-size: 1.3em;
+  line-height: 1.2em;
+}
+td {
+  font-size: 1.1em;
+  line-height: 1.2em;
+}
+
+p, li {
+  font-size: 1.2em;
+  line-height: 1.4em;
+}
+
+.underline {
+  text-decoration: underline;
+}
+
+.text-center {
+  text-align: center;
+}
+
+ol {
+  padding-inline-start: 15px;
+}
 
 .pretty th .current {
   padding-right: 12px;
@@ -27,3 +84,22 @@
 .pretty th .desc {
   background-image: url(/images/down_arrow.gif);
 }
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+nav > a {
+  font-size: 16px;
+  text-underline-offset: 4px;
+  padding: 10px 10px 12px 10px;
+}
+
+@media screen and (min-width: 512px) {
+  nav {
+    justify-content: center;
+  }
+}
+
+
