@@ -17,6 +17,10 @@ html {
   /* Prevent layout jumps when switching to a page where content is shorter than viewport. */
   overflow-y: scroll;
 }
+body {
+  /* Prevent layout from shrinking other content when a long line overflows the viewport */
+  overflow-x: scroll;
+}
 .pretty th .current {
   padding-right: 12px;
   background-repeat: no-repeat;
@@ -32,7 +36,7 @@ html {
 }
 
 nav {
-  text-align: right;
+
   margin-bottom: 30px;
 }
 nav > a {
@@ -40,4 +44,5 @@ nav > a {
   margin-right: 15px;
   text-underline-offset: 4px;
   padding: 10px 10px 12px 10px;
+  margin-left: -10px; /* account for padding to line up with content below */
 }
