@@ -77,11 +77,15 @@
 
       var caseMapUSA = svg.append('g');
 
+     // console.log(<%= @states.to_json %>);
+
+
       getJsonByUrl("data/states-10m.json", function(states_json) {
           console.log(states_json);
           var geojson = topojson.feature(states_json, states_json.objects.states);
           console.log(geojson);
           projection.fitSize([width, height], geojson);
+
           caseMapUSA.selectAll('path')
               .data(geojson.features)
               .enter()
@@ -89,6 +93,25 @@
               .attr('fill', '#ccc')
               .attr('d', path);
 
+          caseMapUSA.selectAll('text')
+            .data(geojson.features)
+            .enter()
+            .append('svg:text')
+            .text(function(d) {
+                console.log("text data");
+                console.log(d);
+                return 'test';
+            })
+            .attr("x", function(d){
+                return path.centroid(d)[0];
+            })
+            .attr("y", function(d){
+                return  path.centroid(d)[1];
+            })
+            .attr("text-anchor","middle")
+            .attr('font-size','12px');
+
+          console.log(caseMapUSA.selectAll('path'));
 
       });
 

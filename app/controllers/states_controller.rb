@@ -97,6 +97,7 @@ attributes = %w{date time seconds_since_Epoch tested positive deaths}
   # GET /states/1
   # GET /states/1.json
   def show
+    @states = State.all
   end
 
   # GET /states/new
