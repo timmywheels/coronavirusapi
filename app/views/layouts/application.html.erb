@@ -1,28 +1,45 @@
 <!DOCTYPE html>
 <html>
-	<head>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-159990365-1"></script>
+  <script>
+      window.dataLayer = window.dataLayer || [];
+
+      function gtag() {
+          dataLayer.push(arguments);
+      }
+
+      gtag('js', new Date());
+      gtag('config', 'UA-159990365-1');
+  </script>
 
 
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-159990365-1"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <title>CoronavirusAPI</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
 
-  gtag('config', 'UA-159990365-1');
-</script>
+  <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+  <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+</head>
 
+<body>
+<input type="checkbox" id="menu">
+<label class="menu-opener" for="menu" onclick></label>
 
-    <title>CoronavirusAPI</title>
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
-
-    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-    <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
-  </head>
-
-  <body>
+  <div class="main-nav">
+    <nav role="off-canvas">
+      <a href="/">Home</a>
+      <a href="/about">About Us</a>
+      <a href="/faq">FAQ</a>
+    </nav>
+  </div>
+  <div class="main-content">
+    <h1 class="main-header"> Coronavirus API Public Health Initiative</h1>
     <%= yield %>
-  </body>
+  </div>
+
+</body>
 </html>
