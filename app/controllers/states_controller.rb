@@ -10,85 +10,150 @@ class StatesController < ApplicationController
   	"OH"=>11536504, "OK"=>3751351, "OR"=>3831074, "PA"=>12702379, "RI"=>1052567, "SC"=>4625364, "SD"=>814180, 
   	"TN"=>6346165, "TX"=>25145561, "US"=>308745538, "UT"=>2763885, "VT"=>625741, "VA"=>8001024, "WA"=>6724540, 
   	"WV"=>1852994, "WI"=>5686986, "WY"=>563626}
+  HOUR = 3600
+
+  # deleted redudant data with:
+  # h={};State.all.order(:crawled_at).map {|s| ((t,p,d=h[s.name])&&(t.to_i>=s.tested.to_i)&&(p.to_i>=s.positive.to_i)&&(d.to_i>=s.deaths.to_i)) ? s.delete : [h[s.name]=[s.tested,s.positive,s.deaths]]}
+  #
 
   def summary
-    @states = State.all.limit(STATE_COUNT).order(id: :desc).reverse
-    @updated_date = @states.first.created_at.to_s
-    @tested = @states.map {|s| s.tested}.compact.sum
-    @positive = @states.map {|s| s.positive}.compact.sum
-    @deaths = @states.map {|s| s.deaths}.compact.sum
-    @sources = @states.map {|s| s.tested_source} + @states.map {|s| s.positive_source} + @states.map {|s| s.deaths_source}
-    @sources = @sources.compact.uniq.sort
-    y=State.all.each_slice(STATE_COUNT).to_a.map {|arr| [arr[0].created_at,
-      arr.map {|i| (i.tested ? i.tested : 0)}.sum, arr.map {|i| (i.positive ? i.positive : 0)}.sum, 
-      arr.map {|i| (i.deaths ? i.deaths : 0) }.sum ].flatten }
-    @chart_tested = {}
-    @chart_pos = {}
-    @chart_deaths = {}
-    y.each do |x, tested, pos, deaths|
-      @chart_tested[x] = tested
-      @chart_pos[x] = pos
-      @chart_deaths[x] = deaths
+    h_tested_state = Hash.new(0)
+    h_pos_state = Hash.new(0)
+    h_deaths_state = Hash.new(0)
+    h_tested_time = Hash.new(0)
+    h_pos_time = Hash.new(0)
+    h_deaths_time = Hash.new(0)
+    prev_time_tested = nil
+    prev_time_pos = nil
+    prev_time_deaths = nil
+    @url = {}
+    State.all.where('official_flag is true').order(crawled_at: :asc).each do |s|
+      curr_time = Time.at((s.crawled_at.to_i/HOUR)*HOUR) # truncate to hour   
+      if s.positive
+        h_pos_time[curr_time] = h_pos_time[prev_time_pos] - h_pos_state[s.name] + s.positive
+        h_pos_state[s.name] = s.positive
+        prev_time_pos = curr_time
+        @url[s.name] = s.positive_source
+      end
+      if s.tested
+        h_tested_time[curr_time] = h_tested_time[prev_time_tested] - h_tested_state[s.name] + s.tested
+        h_tested_state[s.name] = s.tested
+        prev_time_tested = curr_time
+      end
+      if s.deaths
+        h_deaths_time[curr_time] = h_deaths_time[prev_time_deaths] - h_deaths_state[s.name] + s.deaths
+        h_deaths_state[s.name] = s.deaths
+        prev_time_deaths = curr_time
+      end  
     end
-    names = @states.to_a.sort {|i,j| j.positive.to_i <=> i.positive.to_i}.map {|i| i.name }[0..9]
-    @chart_states = names.map do |name|
-      h = {}
-      State.where("name='#{name}'").to_a.map {|s| h[s.created_at.to_date.to_s] = s.positive }
-      {'name' => name,
-       'data' => h
-      }
-    end
-    names = @states.to_a.sort {|i,j| j.positive.to_f/H_POP[j.name.upcase] <=> i.positive.to_f/H_POP[i.name.upcase]}.map {|i| i.name }[0..9]
-    @chart_states2 = names.map do |name|
-      h = {}
-      State.where("name='#{name}'").to_a.map {|s| h[s.created_at.to_date.to_s] = (s.positive.to_f/H_POP[name.upcase]*1000_000_0).round.to_f/10 }
-      {'name' => name,
-       'data' => h
-      }
-    end
-  end
+    @tested_arr = h_tested_state.to_a.sort
+    @h_positive = h_pos_state
+    @h_deaths = h_deaths_state
+    @updated_date = Time.at(prev_time_pos).to_s
 
-  def summary_test
-    @states = State.all.limit(STATE_COUNT).order(id: :desc).reverse
-    @updated_date = @states.first.created_at.to_s
-    @tested = @states.map {|s| s.tested}.compact.sum
-    @positive = @states.map {|s| s.positive}.compact.sum
-    @deaths = @states.map {|s| s.deaths}.compact.sum
-    @sources = @states.map {|s| s.tested_source} + @states.map {|s| s.positive_source} + @states.map {|s| s.deaths_source}
-    @sources = @sources.compact.uniq.sort
-    y=State.all.each_slice(STATE_COUNT).to_a.map {|arr| [arr[0].created_at,
-      arr.map {|i| (i.tested ? i.tested : 0)}.sum, arr.map {|i| (i.positive ? i.positive : 0)}.sum, 
-      arr.map {|i| (i.deaths ? i.deaths : 0) }.sum ].flatten }
-    @chart_tested = {}
-    @chart_pos = {}
-    @chart_deaths = {}
-    y.each do |x, tested, pos, deaths|
-      @chart_tested[x] = tested
-      @chart_pos[x] = pos
-      @chart_deaths[x] = deaths
-    end
-    names = @states.to_a.sort {|i,j| j.positive.to_i <=> i.positive.to_i}.map {|i| i.name }[0..9]
-    @chart_states = names.map do |name|
+    @tested = h_tested_state.values.compact.sum
+    @positive = h_pos_state.values.compact.sum
+    @deaths = h_deaths_state.values.compact.sum
+
+    # chart data for 5 charts
+    @chart_tested = h_tested_time
+    @chart_pos = h_pos_time
+    @chart_deaths = h_deaths_time
+    names = @h_positive.to_a.sort {|a,b| b[1].to_i <=> a[1].to_i}.map {|i| i[0]}[0..9]
+    all_dates = {}
+    states = names.map do |name|
       h = {}
-      State.where("name='#{name}'").to_a.map {|s| h[s.created_at.to_date.to_s] = s.positive }
+      State.where("name='#{name}' and official_flag is true").order(:crawled_at).map {|s| all_dates[x=s.created_at.to_date.to_s] = true; h[x] = s.positive }
+      [name, h]
+    end
+    all_dates = all_dates.keys.sort
+    @chart_states = states.map do |name, h|
+      data = {}
+      prev_val = 0
+      all_dates.each do |a|
+        if h[a]
+          data[a] = h[a]
+          prev_val = h[a]
+        else
+          data[a] = prev_val
+        end
+      end
       {'name' => name,
-       'data' => h
+       'data' => data
       }
     end
-    names = @states.to_a.sort {|i,j| j.positive.to_f/H_POP[j.name.upcase] <=> i.positive.to_f/H_POP[i.name.upcase]}.map {|i| i.name }[0..9]
-    @chart_states2 = names.map do |name|
+    names = @h_positive.to_a.sort {|a,b| b[1].to_f/H_POP[b[0]] <=> a[1].to_f/H_POP[a[0]]}.map {|i| i[0]}[0..9]
+    all_dates = {}
+    states = names.map do |name|
       h = {}
-      State.where("name='#{name}'").to_a.map {|s| h[s.created_at.to_date.to_s] = (s.positive.to_f/H_POP[name.upcase]*1000_000_0).round.to_f/10 }
+      State.where("name='#{name}' and official_flag is true").order(:crawled_at).map {|s| all_dates[x=s.created_at.to_date.to_s] = true; h[x] = (s.positive.to_f/H_POP[name.upcase]*1000_000_0).round.to_f/10 }
+      [name, h]
+    end
+    all_dates = all_dates.keys.sort
+    @chart_states2 = states.map do |name, h|
+      data = {}
+      prev_val = 0
+      all_dates.each do |a|
+        if h[a]
+          data[a] = h[a]
+          prev_val = h[a]
+        else
+          data[a] = prev_val
+        end
+      end
       {'name' => name,
-       'data' => h
+       'data' => data
       }
     end
+
+    # unofficial counts
+    h_tested_state = Hash.new(0)
+    h_pos_state = Hash.new(0)
+    h_deaths_state = Hash.new(0)
+    h_tested_time = Hash.new(0)
+    h_pos_time = Hash.new(0)
+    h_deaths_time = Hash.new(0)
+    prev_time_tested = nil
+    prev_time_pos = nil
+    prev_time_deaths = nil
+    State.all.order(crawled_at: :asc).each do |s|
+      curr_time = Time.at((s.crawled_at.to_i/HOUR)*HOUR) # truncate to hour   
+      if s.positive
+        h_pos_time[curr_time] = h_pos_time[prev_time_pos] - h_pos_state[s.name] + s.positive
+        h_pos_state[s.name] = s.positive
+        prev_time_pos = curr_time
+        @url[s.name] = s.positive_source
+      end
+      if s.tested
+        h_tested_time[curr_time] = h_tested_time[prev_time_tested] - h_tested_state[s.name] + s.tested
+        h_tested_state[s.name] = s.tested
+        prev_time_tested = curr_time
+      end
+      if s.deaths
+        h_deaths_time[curr_time] = h_deaths_time[prev_time_deaths] - h_deaths_state[s.name] + s.deaths
+        h_deaths_state[s.name] = s.deaths
+        prev_time_deaths = curr_time
+      end 
+    end
+    @tested_arr_unofficial = h_tested_state.to_a.sort
+    @h_positive_unofficial = h_pos_state
+    @h_deaths_unofficial = h_deaths_state
+
+    @tested_unofficial = h_tested_state.values.compact.sum
+    @positive_unofficial = h_pos_state.values.compact.sum
+    @deaths_unofficial = h_deaths_state.values.compact.sum
   end
 
   def export_csv
-    @states = State.where("id>#{State.count - STATE_COUNT}")
+    summary
+    data = @tested_arr.map { |state_name, tested| [state_name, tested, @h_positive[state_name], @h_deaths[state_name]] }
+    attributes = %w{name, tested positive deaths}
+    out = CSV.generate(headers: true) do |csv|
+      csv << attributes
+      data.each { |i| csv << i}
+    end
     respond_to do |format|
-      format.csv { send_data @states.to_csv, filename: "states.csv" }
+      format.csv { send_data out, filename: "states.csv" }
     end
   end
 
@@ -101,20 +166,6 @@ class StatesController < ApplicationController
     end
     respond_to do |format|
       format.csv { send_data out, filename: "export_all.csv" }
-    end
-  end
-
-  def export_time_series_csv
-    data = State.all.each_slice(STATE_COUNT).to_a.map {|arr| [arr[0].created_at.to_s[0..18].split(" "),
-    arr[0].created_at.to_i,arr.map {|i| (i.tested ? i.tested : 0)}.sum, 
-    arr.map {|i| (i.positive ? i.positive : 0)}.sum, arr.map {|i| (i.deaths ? i.deaths : 0) }.sum ].flatten }
-    attributes = %w{date time seconds_since_Epoch tested positive deaths}
-    out = CSV.generate(headers: true) do |csv|
-      csv << attributes
-      data.each { |i| csv << i }
-    end
-    respond_to do |format|
-      format.csv { send_data out, filename: "time_series.csv" }
     end
   end
 
