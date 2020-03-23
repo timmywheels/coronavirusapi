@@ -13,7 +13,10 @@
  *= require_tree .
  *= require_self
  */
-
+html {
+  /* Prevent layout jumps when switching to a page where content is shorter than viewport. */
+  overflow-y: scroll;
+}
 .pretty th .current {
   padding-right: 12px;
   background-repeat: no-repeat;
@@ -34,6 +37,7 @@ nav {
 }
 nav > a {
   font-size: 16px;
-  margin-left: 10px;
+  margin-right: 15px;
   text-underline-offset: 4px;
+  padding: 10px 10px 12px 10px;
 }
