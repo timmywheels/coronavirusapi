@@ -1,0 +1,70 @@
+label.menu-opener {
+  position: absolute;
+  left: 0;
+  display: none;
+}
+
+input#menu {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+}
+label.menu-opener {
+  position: absolute;
+  left:0;
+  display:none;
+  width:12px;
+  height:15px;
+  padding:5px;
+  font-size:1.8em;
+  color:#fff;
+  transition:color .3s ease-in-out;
+  cursor: pointer;
+  user-select:none;
+  margin:0;
+  //background:rgba(0, 0, 0, .4);
+  color: black;
+}
+
+.main-content {
+  background-color: white;
+}
+@media screen and (max-width: 44em) {
+  $menu_width: 15em;
+
+  body {
+    overflow-x: hidden;
+
+  }
+
+  nav[role="off-canvas"] {
+    position: absolute;
+    left: -$menu_width;
+    width: $menu_width;
+    top: 50px;
+    flex-direction: column;
+
+    ul > li {
+      width: 100%;
+    }
+  }
+
+  label.menu-opener {
+    display: block;
+  }
+
+  label.menu-opener:after {
+    position: absolute;
+    content: "\2261";
+  }
+
+  input:checked ~ .main-nav nav {
+    margin-left: 15px;
+    left: 15px;
+  }
+
+  input:checked ~ .main-content {
+    margin-left: $menu_width + .5em;
+    margin-right: -($menu_width + .5em);
+  }
+}
