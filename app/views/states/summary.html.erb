@@ -13,6 +13,10 @@
 <h3>To donate crypto, see the donation addresses at the bottom of the page. Thanks!
 </h3>
 
+<p>
+Official counts from government websites:
+</p>
+
 <table class="pretty" border="1">
   <thead>
     <tr>
@@ -26,6 +30,27 @@
         <td><%= @tested %></td>
         <td><%= @positive %></td>
         <td><%= @deaths %></td>
+      </tr>
+  </tbody>
+</table>
+
+<p>
+Unofficial counts based on press releases, news, and other sources:
+</p>
+
+<table class="pretty" border="1">
+  <thead>
+    <tr>
+      <th>Tested</th>
+      <th>Positive</th>
+      <th>Deaths</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><%= @tested_unofficial %></td>
+        <td><%= @positive_unofficial %></td>
+        <td><%= @deaths_unofficial %></td>
       </tr>
   </tbody>
 </table>
@@ -46,15 +71,16 @@
 
 <div class="container">
   <h5>Cases in top states over time:</h5>
-  <%= line_chart @chart_states, {library: {elements: {line: {tension: 0}, point: {radius: 0}}, pointRadius: 0, legend: {position: 'right',}, scales: {yAxes: [{id: 'y-axis', type: 'logarithmic'},]}}} %>
+  <%= line_chart @chart_states, {library: {spanGaps: false, elements: {line: {tension: 0}, point: {radius: 0}}, pointRadius: 10, legend: {position: 'right',}, scales: {yAxes: [{id: 'y-axis', type: 'logarithmic'},]}}} %>
 </div>
+
 
 <div class="container">
   <h5>Cases in top states normalized by population (1 million) over time:</h5>
   <%= line_chart @chart_states2, {library: {elements: {line: {tension: 0}, point: {radius: 0}}, pointRadius: 0, legend: {position: 'right',}, scales: {yAxes: [{id: 'y-axis', type: 'logarithmic'},]}}} %>
 </div>
 
-<h4>Latest data crawled for each state:</h4>
+<h4>Latest official data crawled for each state:</h4>
 
 <table class="pretty" border="1">
   <thead>
@@ -68,32 +94,45 @@
 
   <tbody>
 
-    <% @states.each do |state| %>
+    <% @tested_arr.each do |state_name, tested| %>
       <tr>
-	      <td><a href="<%= state.positive_source %>"><%= state.name %></a></td>
-        <td><%= state.tested %></td>
-        <td><%= state.positive %></td>
-        <td><%= state.deaths %></td>
+	<td><a href="<%= @url[state_name] %>"><%= state_name %></a></td>
+        <td><%= tested %></td>
+        <td><%= @h_positive[state_name] %></td>
+        <td><%= @h_deaths[state_name] %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<h4>Unofficial data crawled for each state:</h4>
+
+<table class="pretty" border="1">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Tested</th>
+      <th>Positive</th>
+      <th>Deaths</th>
+    </tr>
+  </thead>
+
+  <tbody>
+
+    <% @tested_arr_unofficial.each do |state_name, tested| %>
+      <tr>
+        <td><a href="<%= @url[state_name] %>"><%= state_name %></a></td>
+        <td><%= tested %></td>
+        <td><%= @h_positive_unofficial[state_name] %></td>
+        <td><%= @h_deaths_unofficial[state_name] %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
 
 <h4>Download:</h4>
-<a href="/states.csv">State data in csv format</a>
-<br>
-<a href="/time_series.csv">Time series in csv format</a>
+<a href="/states.csv">Official state data in csv format</a>
 
-<h4>Sources:</h4>
-<table>
-	<tbody>
-		<% @sources.each do |s| %>
-			<tr>
-				<td><%= s %></td>
-			</tr>
-		<% end %>
-	</tbody>
-</table>
 
 <h4>Donate:</h4>
 <p>
