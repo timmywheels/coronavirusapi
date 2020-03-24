@@ -19,6 +19,7 @@ class StatesController < ApplicationController
 
   def summary
     timestamp = State.where('official_flag is true').order(:crawled_at).last.crawled_at.to_s
+    skip = false
 begin
     redis = Redis.new(host: "localhost")
     old = redis.get('state_summary_cache')
@@ -42,10 +43,13 @@ begin
 @tested_arr_unofficial,
 @h_positive_unofficial,
 @h_deaths_unofficial = old
-      return
+      skip = true
     end
 rescue => e
 end
+
+unless skip
+
     h_tested_state = Hash.new(0)
     h_pos_state = Hash.new(0)
     h_deaths_state = Hash.new(0)
@@ -88,6 +92,7 @@ end
     @chart_tested = h_tested_time
     @chart_pos = h_pos_time
     @chart_deaths = h_deaths_time
+
     names = @h_positive.to_a.sort {|a,b| b[1].to_i <=> a[1].to_i}.map {|i| i[0]}[0..9]
     all_dates = {}
     states = names.map do |name|
@@ -193,6 +198,19 @@ x=[timestamp,
 @h_positive_unofficial,
 @h_deaths_unofficial].to_s
 redis.set("state_summary_cache", x) rescue nil
+
+    end # unless skip
+    
+    # fix time in 3 charts
+    h = {}
+    @chart_tested.each {|k,v| h[Time.at(k)]=v}
+    @chart_tested = h
+    h = {}
+    @chart_pos.each {|k,v| h[Time.at(k)]=v}
+    @chart_pos = h
+    h = {}
+    @chart_deaths.each {|k,v| h[Time.at(k)]=v}
+    @chart_deaths = h
   end
 
   def export_csv
