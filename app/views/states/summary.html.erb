@@ -100,14 +100,14 @@ Unofficial counts also include press releases, news, and other sources:
     <% @tested_arr.each do |state_name, tested| %>
       <tr>
 	<td><a href="<%= @url[state_name] %>"><%= state_name %></a></td>
-        <td><%= tested %> <%= "(#{@h_tested_unofficial[state_name]})" if @h_tested_unofficial[state_name] > tested %> </td>
-        <td><%= @h_positive[state_name] %> <%= "(#{@h_positive_unofficial[state_name]})" if @h_positive_unofficial[state_name] > @h_positive[state_name] %> </td>
-        <td><%= @h_deaths[state_name] %> <%= "(#{@h_deaths_unofficial[state_name]})" if @h_deaths_unofficial[state_name] > @h_deaths[state_name] %> </td>
+        <td><%= tested %> <%= "(#{@h_tested_unofficial[state_name]})" if @h_tested_unofficial[state_name].to_i > tested.to_i %> </td>
+        <td><%= @h_positive[state_name] %> <%= "(#{@h_positive_unofficial[state_name]})" if @h_positive_unofficial[state_name].to_i > @h_positive[state_name].to_i %></td>
+        <td><%= @h_deaths[state_name] %> <%= "(#{@h_deaths_unofficial[state_name]})" if @h_deaths_unofficial[state_name].to_i > @h_deaths[state_name].to_i %> </td>
         <td><%= (tested.to_f/@population[state_name]*1000000).round %>
-<%= "(#{(@h_tested_unofficial[state_name].to_f/@population[state_name]*1000000).round})" if @h_tested_unofficial[state_name] > tested  %>
+<%= "(#{(@h_tested_unofficial[state_name].to_f/@population[state_name]*1000000).round})" if @h_tested_unofficial[state_name].to_i > tested.to_i %>
 </td>
-        <td><%= (@h_positive[state_name].to_f/tested*1000).round.to_f/10 %></td>
-        <td><%= (@h_deaths[state_name].to_f/@h_positive[state_name]*1000).round.to_f/10 %></td>
+        <td><%= (@h_positive[state_name].to_f/tested.to_f*1000).round.to_f/10 rescue 'N\A' %></td>
+        <td><%= (@h_deaths[state_name].to_f/@h_positive[state_name].to_f*1000).round.to_f/10 rescue 'N\A' %></td>
 
       </tr>
     <% end %>
