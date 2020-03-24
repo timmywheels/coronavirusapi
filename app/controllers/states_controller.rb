@@ -14,9 +14,38 @@ class StatesController < ApplicationController
 
   # deleted redudant data with:
   # h={};State.all.order(:crawled_at).map {|s| ((t,p,d=h[s.name])&&(t.to_i>=s.tested.to_i)&&(p.to_i>=s.positive.to_i)&&(d.to_i>=s.deaths.to_i)) ? s.delete : [h[s.name]=[s.tested,s.positive,s.deaths]]}
-  #
+  # run this after migration:
+  #   # State.all.each {|s| [s.crawled_at=s.created_at, s.save]}
 
   def summary
+    timestamp = State.where('official_flag is true').order(:crawled_at).last.crawled_at.to_s
+begin
+    redis = Redis.new(host: "localhost")
+    old = redis.get('state_summary_cache')
+    if old && (old=eval(old)) && old.shift == timestamp
+@updated_date,
+@url,
+@tested,
+@positive,
+@deaths,
+@tested_unofficial,
+@positive_unofficial,
+@deaths_unofficial,
+@chart_tested,
+@chart_pos,
+@chart_deaths,
+@chart_states,
+@chart_states2,
+@tested_arr,
+@h_positive,
+@h_deaths,
+@tested_arr_unofficial,
+@h_positive_unofficial,
+@h_deaths_unofficial = old
+      return
+    end
+rescue => e
+end
     h_tested_state = Hash.new(0)
     h_pos_state = Hash.new(0)
     h_deaths_state = Hash.new(0)
@@ -28,7 +57,7 @@ class StatesController < ApplicationController
     prev_time_deaths = nil
     @url = {}
     State.all.where('official_flag is true').order(crawled_at: :asc).each do |s|
-      curr_time = Time.at((s.crawled_at.to_i/HOUR)*HOUR) # truncate to hour   
+      curr_time = Time.at((s.crawled_at.to_i/HOUR)*HOUR).to_i # truncate to hour   
       if s.positive
         h_pos_time[curr_time] = h_pos_time[prev_time_pos] - h_pos_state[s.name] + s.positive
         h_pos_state[s.name] = s.positive
@@ -63,7 +92,7 @@ class StatesController < ApplicationController
     all_dates = {}
     states = names.map do |name|
       h = {}
-      State.where("name='#{name}' and official_flag is true").order(:crawled_at).map {|s| all_dates[x=s.created_at.to_date.to_s] = true; h[x] = s.positive }
+      State.where("name='#{name}' and official_flag is true").order(:crawled_at).map {|s| all_dates[x=s.crawled_at.to_date.to_s] = true; h[x] = s.positive }
       [name, h]
     end
     all_dates = all_dates.keys.sort
@@ -86,7 +115,7 @@ class StatesController < ApplicationController
     all_dates = {}
     states = names.map do |name|
       h = {}
-      State.where("name='#{name}' and official_flag is true").order(:crawled_at).map {|s| all_dates[x=s.created_at.to_date.to_s] = true; h[x] = (s.positive.to_f/H_POP[name.upcase]*1000_000_0).round.to_f/10 }
+      State.where("name='#{name}' and official_flag is true").order(:crawled_at).map {|s| all_dates[x=s.crawled_at.to_date.to_s] = true; h[x] = (s.positive.to_f/H_POP[name.upcase]*1000_000_0).round.to_f/10 }
       [name, h]
     end
     all_dates = all_dates.keys.sort
@@ -142,6 +171,28 @@ class StatesController < ApplicationController
     @tested_unofficial = h_tested_state.values.compact.sum
     @positive_unofficial = h_pos_state.values.compact.sum
     @deaths_unofficial = h_deaths_state.values.compact.sum
+
+x=[timestamp,
+@updated_date,
+@url,
+@tested,
+@positive,
+@deaths, 
+@tested_unofficial,
+@positive_unofficial,
+@deaths_unofficial,
+@chart_tested,
+@chart_pos,
+@chart_deaths,
+@chart_states,
+@chart_states2,
+@tested_arr,
+@h_positive,
+@h_deaths,
+@tested_arr_unofficial,
+@h_positive_unofficial,
+@h_deaths_unofficial].to_s
+redis.set("state_summary_cache", x) rescue nil
   end
 
   def export_csv
@@ -158,7 +209,7 @@ class StatesController < ApplicationController
   end
 
   def export_all
-    data = State.all.map {|s| [s.created_at.to_i, s.name, s.tested, s.positive, s.deaths]}
+    data = State.all.map {|s| [s.crawled_at.to_i, s.name, s.tested, s.positive, s.deaths]}
     attributes = %w{seconds_since_Epoch state tested positive deaths}
     out = CSV.generate(headers: true) do |csv|
       csv << attributes
