@@ -43,7 +43,8 @@ begin
 @h_deaths,
 @h_tested_unofficial,
 @h_positive_unofficial,
-@h_deaths_unofficial = old
+@h_deaths_unofficial,
+@dates_time_series = old
       skip = true
     end
 rescue => e
@@ -61,8 +62,10 @@ unless skip
     prev_time_pos = nil
     prev_time_deaths = nil
     @url = {}
+    @dates_time_series = {}
     State.all.where('official_flag is true').order(crawled_at: :asc).each do |s|
       curr_time = Time.at((s.crawled_at.to_i/HOUR)*HOUR).to_i # truncate to hour   
+      @dates_time_series[curr_time] = true
       if s.positive && s.positive > h_pos_state[s.name]
         h_pos_time[curr_time] = h_pos_time[prev_time_pos] - h_pos_state[s.name] + s.positive
         h_pos_state[s.name] = s.positive
@@ -197,7 +200,8 @@ x=[timestamp,
 @h_deaths,
 @h_tested_unofficial,
 @h_positive_unofficial,
-@h_deaths_unofficial].to_s
+@h_deaths_unofficial,
+@dates_time_series].to_s
 redis.set("state_summary_cache", x) rescue nil
 
     end # unless skip
@@ -224,6 +228,27 @@ redis.set("state_summary_cache", x) rescue nil
     end
     respond_to do |format|
       format.csv { send_data out, filename: "states.csv" }
+    end
+  end
+
+  def export_time_series_csv
+    summary
+    tested = pos = deaths = 0
+    data = @dates_time_series.keys.map do |t|
+      s = Time.at(t).to_s
+      t2 = Time.at t
+      [s[0..9], s[11..18], t, 
+       @chart_tested[t2] ? (tested=@chart_tested[t2]) : tested, 
+       @chart_pos[t2] ? (pos=@chart_pos[t2]) : pos, 
+       @chart_deaths[t2] ? (deaths=@chart_deaths[t2]) : deaths]
+    end
+    attributes = %w{date time seconds_since_Epoch tested positive deaths}
+    out = CSV.generate(headers: true) do |csv|
+      csv << attributes
+      data.each { |i| csv << i }
+    end
+    respond_to do |format|
+      format.csv { send_data out, filename: "time_series.csv" }
     end
   end
 
