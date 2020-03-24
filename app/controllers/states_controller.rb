@@ -253,7 +253,7 @@ redis.set("state_summary_cache", x) rescue nil
   end
 
   def export_all
-    data = State.all.map {|s| [s.crawled_at.to_i, s.name, s.tested, s.positive, s.deaths]}
+    data = State.where('official_flag is true').order(:crawled_at).all.map {|s| [s.crawled_at.to_i, s.name, s.tested, s.positive, s.deaths]}
     attributes = %w{seconds_since_Epoch state tested positive deaths}
     out = CSV.generate(headers: true) do |csv|
       csv << attributes
@@ -264,7 +264,20 @@ redis.set("state_summary_cache", x) rescue nil
     end
   end
 
-
+  def get_time_series
+    if (st = params['name']) && st.size < 3
+      s = "seconds_since_Epoch,tested,positive,deaths\n"
+      arr = State.where("official_flag is true and name='#{st.upcase}'").order(:crawled_at).all.map {|i| [i.crawled_at.to_i, i.tested, i.positive, i.deaths].join(",")}
+      if arr.size == 0
+        s = "#{st} not found"
+      else
+        s += arr.join("\n")
+      end
+    else
+      s = "Please use a 2 letter state abbreviation"
+    end
+    render plain: s
+  end
 
   # unused scaffolding code
 
