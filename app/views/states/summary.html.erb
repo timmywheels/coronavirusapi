@@ -27,9 +27,9 @@ Official counts from government websites:
   </thead>
   <tbody>
       <tr>
-        <td><%= @tested %></td>
-        <td><%= @positive %></td>
-        <td><%= @deaths %></td>
+        <td><%= number_with_delimiter(@tested) %></td>
+        <td><%= number_with_delimiter(@positive) %></td>
+        <td><%= number_with_delimiter(@deaths) %></td>
       </tr>
   </tbody>
 </table>
@@ -48,9 +48,9 @@ Unofficial counts also include press releases, news, and other sources:
   </thead>
   <tbody>
       <tr>
-        <td><%= @tested_unofficial %></td>
-        <td><%= @positive_unofficial %></td>
-        <td><%= @deaths_unofficial %></td>
+        <td><%= number_with_delimiter(@tested_unofficial) %></td>
+        <td><%= number_with_delimiter(@positive_unofficial) %></td>
+        <td><%= number_with_delimiter(@deaths_unofficial) %></td>
       </tr>
   </tbody>
 </table>
@@ -62,22 +62,22 @@ Unofficial counts also include press releases, news, and other sources:
 </div>
 <div class="container">
   <h5>Total positive cases over time:</h5>
-  <%= line_chart @chart_pos, curve: false, xtitle: "Date", points: false, thousands: "," %>
+  <%= line_chart @chart_pos, curve: false, xtitle: "Date", points: false, thousands: ",", library: {spanGaps: false, elements: {line: {tension: 0}, point: {radius: 0}}, pointRadius: 10, legend: {position: 'right',}, scales: {yAxes: [{id: 'y-axis', type: 'logarithmic'},]}} %>
 </div>
 <div class="container">
   <h5>Total deaths over time:</h5>
-  <%= line_chart @chart_deaths, curve: false, xtitle: "Date", points: false, thousands: "," %>
+  <%= line_chart @chart_deaths, curve: false, xtitle: "Date", points: false, thousands: ",", library: {spanGaps: false, elements: {line: {tension: 0}, point: {radius: 0}}, pointRadius: 10, legend: {position: 'right',}, scales: {yAxes: [{id: 'y-axis', type: 'logarithmic'},]}} %>
 </div>
 
 <div class="container">
   <h5>Cases in top states over time:</h5>
-  <%= line_chart @chart_states, {library: {spanGaps: false, elements: {line: {tension: 0}, point: {radius: 0}}, pointRadius: 10, legend: {position: 'right',}, scales: {yAxes: [{id: 'y-axis', type: 'logarithmic'},]}}} %>
+  <%= line_chart @chart_states, {thousands: ",", library: {spanGaps: false, elements: {line: {tension: 0}, point: {radius: 0}}, pointRadius: 10, legend: {position: 'right',}, scales: {yAxes: [{id: 'y-axis', type: 'logarithmic'},]}}} %>
 </div>
 
 
 <div class="container">
   <h5>Cases in top states normalized by population (1 million) over time:</h5>
-  <%= line_chart @chart_states2, {library: {elements: {line: {tension: 0}, point: {radius: 0}}, pointRadius: 0, legend: {position: 'right',}, scales: {yAxes: [{id: 'y-axis', type: 'logarithmic'},]}}} %>
+  <%= line_chart @chart_states2, {thousands: ",", library: {elements: {line: {tension: 0}, point: {radius: 0}}, pointRadius: 0, legend: {position: 'right',}, scales: {yAxes: [{id: 'y-axis', type: 'logarithmic'},]}}} %>
 </div>
 
 <h4>Latest official data crawled for each state (unofficial counts in parenthesis):</h4>
