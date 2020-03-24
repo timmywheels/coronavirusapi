@@ -18,6 +18,7 @@ class StatesController < ApplicationController
   #   # State.all.each {|s| [s.crawled_at=s.created_at, s.save]}
 
   def summary
+    @population = H_POP
     timestamp = State.where('official_flag is true').order(:crawled_at).last.crawled_at.to_s
     skip = false
 begin
@@ -40,7 +41,7 @@ begin
 @tested_arr,
 @h_positive,
 @h_deaths,
-@tested_arr_unofficial,
+@h_tested_unofficial,
 @h_positive_unofficial,
 @h_deaths_unofficial = old
       skip = true
@@ -169,7 +170,7 @@ unless skip
         prev_time_deaths = curr_time
       end 
     end
-    @tested_arr_unofficial = h_tested_state.to_a.sort
+    @h_tested_unofficial = h_tested_state
     @h_positive_unofficial = h_pos_state
     @h_deaths_unofficial = h_deaths_state
 
@@ -194,7 +195,7 @@ x=[timestamp,
 @tested_arr,
 @h_positive,
 @h_deaths,
-@tested_arr_unofficial,
+@h_tested_unofficial,
 @h_positive_unofficial,
 @h_deaths_unofficial].to_s
 redis.set("state_summary_cache", x) rescue nil

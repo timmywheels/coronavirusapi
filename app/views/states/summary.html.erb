@@ -35,7 +35,7 @@ Official counts from government websites:
 </table>
 
 <p>
-Unofficial counts based on press releases, news, and other sources:
+Unofficial counts also include press releases, news, and other sources:
 </p>
 
 <table class="pretty" border="1">
@@ -80,7 +80,7 @@ Unofficial counts based on press releases, news, and other sources:
   <%= line_chart @chart_states2, {library: {elements: {line: {tension: 0}, point: {radius: 0}}, pointRadius: 0, legend: {position: 'right',}, scales: {yAxes: [{id: 'y-axis', type: 'logarithmic'},]}}} %>
 </div>
 
-<h4>Latest official data crawled for each state:</h4>
+<h4>Latest official data crawled for each state (unofficial counts in parenthesis):</h4>
 
 <table class="pretty" border="1">
   <thead>
@@ -89,6 +89,9 @@ Unofficial counts based on press releases, news, and other sources:
       <th>Tested</th>
       <th>Positive</th>
       <th>Deaths</th>
+      <th>Tested/1M People</th>
+      <th>Positive/Tested %</th>
+      <th>Deaths/Positive %</th>
     </tr>
   </thead>
 
@@ -97,34 +100,15 @@ Unofficial counts based on press releases, news, and other sources:
     <% @tested_arr.each do |state_name, tested| %>
       <tr>
 	<td><a href="<%= @url[state_name] %>"><%= state_name %></a></td>
-        <td><%= tested %></td>
-        <td><%= @h_positive[state_name] %></td>
-        <td><%= @h_deaths[state_name] %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+        <td><%= tested %> <%= "(#{@h_tested_unofficial[state_name]})" if @h_tested_unofficial[state_name] > tested %> </td>
+        <td><%= @h_positive[state_name] %> <%= "(#{@h_positive_unofficial[state_name]})" if @h_positive_unofficial[state_name] > @h_positive[state_name] %> </td>
+        <td><%= @h_deaths[state_name] %> <%= "(#{@h_deaths_unofficial[state_name]})" if @h_deaths_unofficial[state_name] > @h_deaths[state_name] %> </td>
+        <td><%= (tested.to_f/@population[state_name]*1000000).round %>
+<%= "(#{(@h_tested_unofficial[state_name].to_f/@population[state_name]*1000000).round})" if @h_tested_unofficial[state_name] > tested  %>
+</td>
+        <td><%= (@h_positive[state_name].to_f/tested*1000).round.to_f/10 %></td>
+        <td><%= (@h_deaths[state_name].to_f/@h_positive[state_name]*1000).round.to_f/10 %></td>
 
-<h4>Unofficial data crawled for each state:</h4>
-
-<table class="pretty" border="1">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Tested</th>
-      <th>Positive</th>
-      <th>Deaths</th>
-    </tr>
-  </thead>
-
-  <tbody>
-
-    <% @tested_arr_unofficial.each do |state_name, tested| %>
-      <tr>
-        <td><a href="<%= @url[state_name] %>"><%= state_name %></a></td>
-        <td><%= tested %></td>
-        <td><%= @h_positive_unofficial[state_name] %></td>
-        <td><%= @h_deaths_unofficial[state_name] %></td>
       </tr>
     <% end %>
   </tbody>
